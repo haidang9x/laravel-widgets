@@ -6,6 +6,7 @@ use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
 use RuntimeException;
 use Symfony\Component\Console\Input\InputOption;
+use Illuminate\Support\Collection;
 
 class WidgetMakeCommand extends GeneratorCommand
 {
@@ -196,7 +197,15 @@ class WidgetMakeCommand extends GeneratorCommand
 
         $this->makeDirectory($path);
 
-        $this->files->put($path, '');
+
+        $config_json = [
+            'name' => dirname($path),
+        ];
+        $json = Collection::make($config_json)->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $path_config = rtrim($path, '.blade.php') . '.json';
+
+        $this->files->put($path_config, $json);
+        $this->files->put($path, 'Hai dang * Create A Widget Html Blade With Custom Theme *');
 
         $this->info('View created successfully.');
     }
@@ -208,7 +217,8 @@ class WidgetMakeCommand extends GeneratorCommand
      */
     protected function getViewPath()
     {
-        return base_path('resources/views').'/widgets/'.$this->makeViewName().'.blade.php';
+        $path = base_path('Themes/' . config('theme.active') . '/views');//base_path('resources/views')
+        return $path .'/widgets/'.$this->makeViewName().'/main.blade.php';
     }
 
     /**
