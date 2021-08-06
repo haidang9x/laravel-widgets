@@ -12,7 +12,14 @@ class {{class}} extends AbstractWidget
      * @var array
      */
     protected $config = [];
+    protected $view = '';
+    public function __construct(array $config = [])
+    {
+        // $this->addConfigDefaults([]);
 
+        $view = !empty($config['widget']->view)?$config['widget']->view:'{{view}}';
+        parent::__construct($config);
+    }
     /**
      * Treat this method as a controller action.
      * Return view() or other content to display.
@@ -20,8 +27,7 @@ class {{class}} extends AbstractWidget
     public function run()
     {
         //
-
-        return view('{{view}}', [
+        return view($view, [
             'config' => $this->config,
         ]);
     }
