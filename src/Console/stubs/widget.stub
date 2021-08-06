@@ -17,7 +17,7 @@ class {{class}} extends AbstractWidget
     {
         // $this->addConfigDefaults([]);
 
-        $view = !empty($config['widget']->view)?$config['widget']->view:'{{view}}';
+        $this->view = !empty($config['widget']->view)?$config['widget']->view:'{{view}}';
         parent::__construct($config);
     }
     /**
@@ -27,7 +27,7 @@ class {{class}} extends AbstractWidget
     public function run()
     {
         //
-        return view($view, [
+        return view($this->view, [
             'config' => $this->config,
         ]);
     }
