@@ -41,6 +41,7 @@ abstract class AbstractWidget
      * @var array
      */
     protected $config = [];
+    protected $view = '';
 
     /**
      * Constructor.
@@ -49,6 +50,8 @@ abstract class AbstractWidget
      */
     public function __construct(array $config = [])
     {
+        if(!empty($config['view'])) $this->view = $config['view'];
+        if(isset($config['json'])) $config['json'] = json_decode($config['json']);
         foreach ($config as $key => $value) {
             $this->config[$key] = $value;
         }
