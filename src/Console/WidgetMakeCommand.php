@@ -200,7 +200,8 @@ class WidgetMakeCommand extends GeneratorCommand
 
         $name = str_replace($this->laravel->getNamespace(), '', $this->argument('name'));
         $config_json = [
-            'view_name' => basename(dirname($path)),
+            'name' => basename(dirname($path)),
+            'style' => 'main',
             'run_name' => $name
         ];
         $json = Collection::make($config_json)->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

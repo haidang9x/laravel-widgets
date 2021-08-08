@@ -15,7 +15,7 @@ class {{class}} extends AbstractWidget
     public function __construct(array $config = [])
     {
         // $this->addConfigDefaults([]);
-        if(!$this->view) $this->view = '{{view}}';
+        if(!$this->view) $this->view = '{{view}}.main';
         parent::__construct($config);
     }
     /**
