@@ -199,8 +199,9 @@ class WidgetMakeCommand extends GeneratorCommand
 
 
         $name = str_replace($this->laravel->getNamespace(), '', $this->argument('name'));
+        $widget_name = basename(dirname($path));
         $config_json = [
-            'name' => basename(dirname($path)),
+            'name' => $widget_name,
             'style' => 'main',
             'run_name' => $name
         ];
@@ -209,6 +210,7 @@ class WidgetMakeCommand extends GeneratorCommand
 
         $this->files->put($path_config, $json);
         $this->files->put($path, 'Hai dang * Create A Widget Html Blade With Custom Theme *');
+        $this->files->put(base_path('/Themes/admin/views/pages/settings/widget/' . $widget_name . '.blade.php'), '*Widget Settings*');
 
         $this->info('View created successfully.');
     }
