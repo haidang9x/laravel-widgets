@@ -209,8 +209,15 @@ class WidgetMakeCommand extends GeneratorCommand
         $path_config = rtrim($path, '.blade.php') . '.json';
 
         $this->files->put($path_config, $json);
-        $this->files->put($path, 'Hai dang * Create A Widget Html Blade With Custom Theme *');
-        $this->files->put(base_path('/Themes/admin/views/pages/settings/widget/' . $widget_name . '.blade.php'), '*Widget Settings*');
+        $this->files->put($path, file_get_contents(__DIR__ . '/stubs/widget_html_blade.blade.php'));
+
+        $widget_blade_setting = file_get_contents(__DIR__ . '/stubs/widget_setting.blade.php');
+        $widget_blade_setting = str_replace('[run_name]', $name, $widget_blade_setting);
+        $this->files->put(base_path('/Themes/admin/views/pages/settings/widget/' . $widget_name . '.blade.php'), $widget_blade_setting);
+
+        $widget_controller_setting = file_get_contents(__DIR__ . '/stubs/settings_controller.php');
+        $widget_controller_setting = str_replace('class RunName', "class $name", $widget_controller_setting);
+        $this->files->put(app_path('Http/Controllers/Admin/WidgetsSetting/' . $name . '.php'), $widget_controller_setting);
 
         $this->info('View created successfully.');
     }
