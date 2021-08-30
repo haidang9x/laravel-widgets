@@ -2,7 +2,8 @@
     <form class="setting-form mb-2">
         <div class="form-group">
             <div class="custom-control custom-switch">
-                <input id="{{ "label-$uqid" }}" name="global" type="checkbox" class="custom-control-input" {{ !empty($item->global)?'checked':'' }}>
+                <input id="{{ "label-$uqid" }}" name="global" type="checkbox"
+                       class="custom-control-input" {{ !empty($item->global)?'checked':'' }}>
                 <label class="custom-control-label" for="{{ "label-$uqid" }}">Use global widget</label>
             </div>
         </div>
@@ -32,7 +33,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">{{ $item->name }}</h4>
+                        <h4 class="modal-title">{{ $item->title??ucwords(str_replace('_', ' ', $item->name)) }}</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
@@ -51,56 +52,53 @@
         </div>
     </form>
 </div>
+@section('widgets_js')
+@parent
 <script>
     (function () {
         var uqid = '{{ $uqid }}';
-        var widgetElementSetting = document.getElementById(uqid);
-        var formSetting = widgetElementSetting.getElementsByClassName('setting-form')[0];
         var widgetJson = {!! json_encode($item) !!};
-        formSetting.onsubmit = function () {
+        function settingSave(that) {
+            setItemPathIndex(widgetJson, $(that));
             settings_queue['set' + uqid] = {
-                action: async function () {
-                    var data = {
-                        config: widgetJson,
-                        post_data: []
-                    };
-                    $.ajax({
-                        url: '{{ route('admin_widgets_setting', ['run-name' => '[run_name]']) }}',
-                        type: 'POST',
-                        data: data,
-                        headers: headers,
-                        success: function () {
-
-                        }
-                    });
-                }
+                type: 'setting',
+                config: widgetJson,
+                post_data: $(that).serialize(),
+                run_name: 'FaqsFromBing'
             };
-            var btnSubmit = $(this).find('button[type="submit"]');
-            setTimeout(function(t) {btnSubmit.text(t)}, 2000, btnSubmit.text());
-            btnSubmit.text('Saved!');
+            var btnSubmit = $(that).find('button[type="submit"]');
+            if(btnSubmit.text() != 'Saved!') {
+                setTimeout(function (t) {
+                    btnSubmit.text(t);
+                }, 2000, btnSubmit.text());
+                btnSubmit.text('Saved!');
+            }
             return false;
-        };
-        var formContent = widgetElementSetting.getElementsByClassName('content-form')[0];
-        formContent.onsubmit = function () {
+        }
+        $('#' + uqid).find('.setting-form :input').on('change', function () {
+            var that = $(this).parents('form').eq(0);
+            settingSave(that);
+        });
+        $('#' + uqid).find('.setting-form').on('submit', function(){
+            settingSave(this);
+            return false;
+        });
+        $('#' + uqid).find('.content-form').on('submit', function () {
+            setItemPathIndex(widgetJson, $(this));
+            var enableGlobal = $('#'+uqid).find('input[name="global"]').is(':checked');
             settings_queue['content' + uqid] = {
-                action: async function () {
-                    var data = {
-                        config: widgetJson,
-                        post_data: []
-                    };
-                    $.ajax({
-                        url: '{{ route('admin_widgets_content', ['run-name' => '[run_name]']) }}',
-                        type: 'POST',
-                        data: data,
-                        headers: headers,
-                        success: function () {
-
-                        }
-                    });
-                }
+                type: 'content',
+                config: widgetJson,
+                post_data: $(this).serialize(),
+                run_name: '[run_name]',
+                global: enableGlobal
             };
             $('#{{ "modal-$uqid" }}').modal('hide');
             return false;
-        };
+        });
     })();
 </script>
+@stop
+@if(!empty($draggabled))
+    @yield('widgets_js')
+@endif

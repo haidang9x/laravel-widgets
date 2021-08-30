@@ -8,8 +8,7 @@ use RuntimeException;
 use Symfony\Component\Console\Input\InputOption;
 use Illuminate\Support\Collection;
 
-class WidgetMakeCommand extends GeneratorCommand
-{
+class WidgetMakeCommand extends GeneratorCommand {
     /**
      * The console command name.
      *
@@ -36,8 +35,7 @@ class WidgetMakeCommand extends GeneratorCommand
      *
      * @return void
      */
-    public function handle()
-    {
+    public function handle() {
         // hack for Laravel < 5.5
         if (is_callable('parent::handle')) {
             parent::handle();
@@ -55,8 +53,7 @@ class WidgetMakeCommand extends GeneratorCommand
      *
      * @return void
      */
-    public function fire()
-    {
+    public function fire() {
         parent::fire();
 
         if (!$this->option('plain')) {
@@ -71,8 +68,7 @@ class WidgetMakeCommand extends GeneratorCommand
      *
      * @return string
      */
-    protected function buildClass($name)
-    {
+    protected function buildClass($name) {
         $stub = $this->files->get($this->getStub());
 
         $stub = $this->replaceNamespace($stub, $name)->replaceClass($stub, $name);
@@ -89,17 +85,16 @@ class WidgetMakeCommand extends GeneratorCommand
      *
      * @return string
      */
-    protected function getStub()
-    {
+    protected function getStub() {
         $stubName = $this->option('plain') ? 'widget_plain' : 'widget';
-        $stubPath = $this->laravel->make('config')->get('laravel-widgets.'.$stubName.'_stub');
+        $stubPath = $this->laravel->make('config')->get('laravel-widgets.' . $stubName . '_stub');
 
         // for BC
         if (is_null($stubPath)) {
-            return __DIR__.'/stubs/'.$stubName.'.stub';
+            return __DIR__ . '/stubs/' . $stubName . '.stub';
         }
 
-        return $this->laravel->basePath().'/'.$stubPath;
+        return $this->laravel->basePath() . '/' . $stubPath;
     }
 
     /**
@@ -110,8 +105,7 @@ class WidgetMakeCommand extends GeneratorCommand
      *
      * @return $this
      */
-    protected function replaceNamespace(&$stub, $name)
-    {
+    protected function replaceNamespace(&$stub, $name) {
         $stub = str_replace(
             '{{namespace}}', $this->getNamespace($name), $stub
         );
@@ -131,9 +125,8 @@ class WidgetMakeCommand extends GeneratorCommand
      *
      * @return string
      */
-    protected function replaceClass($stub, $name)
-    {
-        $class = str_replace($this->getNamespace($name).'\\', '', $name);
+    protected function replaceClass($stub, $name) {
+        $class = str_replace($this->getNamespace($name) . '\\', '', $name);
 
         return str_replace('{{class}}', $class, $stub);
     }
@@ -145,9 +138,8 @@ class WidgetMakeCommand extends GeneratorCommand
      *
      * @return string
      */
-    protected function replaceView($stub)
-    {
-        $view = 'widgets.'.str_replace('/', '.', $this->makeViewName());
+    protected function replaceView($stub) {
+        $view = 'widgets.' . str_replace('/', '.', $this->makeViewName());
 
         return str_replace('{{view}}', $view, $stub);
     }
@@ -159,9 +151,8 @@ class WidgetMakeCommand extends GeneratorCommand
      *
      * @return string
      */
-    protected function getDefaultNamespace($rootNamespace)
-    {
-        $namespace = config('laravel-widgets.default_namespace', $rootNamespace.'\Widgets');
+    protected function getDefaultNamespace($rootNamespace) {
+        $namespace = config('laravel-widgets.default_namespace', $rootNamespace . '\Widgets');
 
         if (!Str::startsWith($namespace, $rootNamespace)) {
             throw new RuntimeException("You can not use the generator if the default namespace ($namespace) does not start with application namespace ($rootNamespace)");
@@ -175,8 +166,7 @@ class WidgetMakeCommand extends GeneratorCommand
      *
      * @return array
      */
-    protected function getOptions()
-    {
+    protected function getOptions() {
         return [
             ['plain', null, InputOption::VALUE_NONE, 'Use plain stub. No view is being created too.'],
         ];
@@ -187,37 +177,65 @@ class WidgetMakeCommand extends GeneratorCommand
      *
      * return void
      */
-    protected function createView()
-    {
-        if ($this->files->exists($path = $this->getViewPath())) {
-            $this->error('View already exists!');
+    protected function createView() {
+        if ($this->files->exists($path = $this->getViewPath()) || $this->files->exists($pathDefault = $this->getViewPathDefault())) {
+            $this->error('View already exists!' . $path. ' | ' . $pathDefault);
 
             return;
         }
 
         $this->makeDirectory($path);
+        $this->makeDirectory($pathDefault);
 
 
         $name = str_replace($this->laravel->getNamespace(), '', $this->argument('name'));
         $widget_name = basename(dirname($path));
+        $title_name = ucwords(str_replace('_', ' ', $widget_name));
         $config_json = [
+            'title' => $title_name,
             'name' => $widget_name,
             'style' => 'main',
             'run_name' => $name
         ];
+        //set config
         $json = Collection::make($config_json)->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        $path_config = rtrim($path, '.blade.php') . '.json';
+        $path_config_r = rtrim($path, '.blade.php');
+        $path_config_default_r = rtrim($pathDefault, '.blade.php');
+        $path_config = $path_config_r . '.json';
+        $path_config_default = $path_config_default_r . '.json';
+        $path_config_ini = $path_config_r . '_ini.json';
+        $path_config_default_ini = $path_config_default_r . '_ini.json';
 
+        //put data config
         $this->files->put($path_config, $json);
+        $this->files->put($path_config_default, $json);
+        $this->files->put($path_config_ini, $json);
+        $this->files->put($path_config_default_ini, $json);
         $this->files->put($path, file_get_contents(__DIR__ . '/stubs/widget_html_blade.blade.php'));
+        $this->files->put($pathDefault, file_get_contents(__DIR__ . '/stubs/widget_html_blade.blade.php'));
 
+        //for admin settings
         $widget_blade_setting = file_get_contents(__DIR__ . '/stubs/widget_setting.blade.php');
         $widget_blade_setting = str_replace('[run_name]', $name, $widget_blade_setting);
-        $this->files->put(base_path('/Themes/admin/views/pages/settings/widget/' . $widget_name . '.blade.php'), $widget_blade_setting);
+        $this->files->put(base_path('/Themes/admin/views/pages/interface/settings/widgets/' . $widget_name . '.blade.php'), $widget_blade_setting);
 
+        //controller settings
         $widget_controller_setting = file_get_contents(__DIR__ . '/stubs/settings_controller.php');
         $widget_controller_setting = str_replace('class RunName', "class $name", $widget_controller_setting);
         $this->files->put(app_path('Http/Controllers/Admin/WidgetsSetting/' . $name . '.php'), $widget_controller_setting);
+
+        //controller get data
+//        $file_controller_data = app_path('Http/Controllers/Getter.php');
+//        $controller_data = file_get_contents($file_controller_data);
+//        if (strpos($controller_data, "function $name") === false
+//            && strpos($controller_data, $auto_add='//AUTO_ADD=ON') !== false
+//        ) {
+//            $controller_data = str_replace(
+//                $auto_add,
+//                "\npublic function $name(\$options=[]) {\n    }\n    $auto_add",
+//                $controller_data);
+//            file_put_contents($file_controller_data, $controller_data);
+//        }
 
         $this->info('View created successfully.');
     }
@@ -227,10 +245,14 @@ class WidgetMakeCommand extends GeneratorCommand
      *
      * @return string
      */
-    protected function getViewPath()
-    {
+    protected function getViewPath() {
         $path = base_path('Themes/' . config('theme.active') . '/views');//base_path('resources/views')
-        return $path .'/widgets/'.$this->makeViewName().'/main.blade.php';
+        return $path . '/widgets/' . $this->makeViewName() . '/main.blade.php';
+    }
+
+    protected function getViewPathDefault() {
+        $path = base_path('Themes/default/views');
+        return $path . '/widgets/' . $this->makeViewName() . '/main.blade.php';
     }
 
     /**
@@ -238,8 +260,7 @@ class WidgetMakeCommand extends GeneratorCommand
      *
      * @return string
      */
-    protected function makeViewName()
-    {
+    protected function makeViewName() {
         $name = str_replace($this->laravel->getNamespace(), '', $this->argument('name'));
         $name = str_replace('\\', '/', $name);
 

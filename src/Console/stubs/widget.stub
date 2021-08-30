@@ -11,11 +11,9 @@ class {{class}} extends AbstractWidget
      *
      * @var array
      */
-    protected $config = [];
-    public function __construct(array $config = [])
-    {
-        // $this->addConfigDefaults([]);
-        if(!$this->view) $this->view = '{{view}}.main';
+
+    public function __construct(array $config = []) {
+        $this->default_view = '{{view}}.main';
         parent::__construct($config);
     }
     /**
