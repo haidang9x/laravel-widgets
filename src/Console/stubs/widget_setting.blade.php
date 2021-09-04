@@ -85,7 +85,7 @@
         });
         $('#' + uqid).find('.content-form').on('submit', function () {
             setItemPathIndex(widgetJson, $(this));
-            var enableGlobal = $('#'+uqid).find('input[name="global"]').is(':checked');
+            var enableGlobal = $('#'+uqid).find('input[name="global"]').is(':checked')?1:0;
             settings_queue['content' + uqid] = {
                 type: 'content',
                 config: widgetJson,
