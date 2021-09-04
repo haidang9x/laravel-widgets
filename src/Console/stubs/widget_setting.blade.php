@@ -1,4 +1,4 @@
-<div id="{{ $uqid = uniqid() }}">
+<div id="{{ $uqid = uniqid() }}" class="widget-options">
     <form class="setting-form mb-2">
         <div class="form-group">
             <div class="custom-control custom-switch">
