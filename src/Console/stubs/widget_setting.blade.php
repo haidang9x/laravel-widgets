@@ -54,7 +54,7 @@
 </div>
 @section('widgets_js')
 @parent
-<script>
+<script type="text/babel">
     (function () {
         var uqid = '{{ $uqid }}';
         var widgetJson = {!! json_encode($item) !!};
