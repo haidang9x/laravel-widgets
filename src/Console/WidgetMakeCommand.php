@@ -178,6 +178,7 @@ class WidgetMakeCommand extends GeneratorCommand {
      * return void
      */
     protected function createView() {
+        $activeTheme = config('theme.active');
         if ($this->files->exists($path = $this->getViewPath()) || $this->files->exists($pathDefault = $this->getViewPathDefault())) {
             $this->error('View already exists!' . $path. ' | ' . $pathDefault);
 
@@ -185,7 +186,7 @@ class WidgetMakeCommand extends GeneratorCommand {
         }
 
         $this->makeDirectory($path);
-        $this->makeDirectory($pathDefault);
+        if($activeTheme !== 'default') $this->makeDirectory($pathDefault);
 
 
         $name = str_replace($this->laravel->getNamespace(), '', $this->argument('name'));
