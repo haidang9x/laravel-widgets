@@ -7,18 +7,17 @@ use Arrilot\Widgets\Factories\AsyncWidgetFactory;
 use Arrilot\Widgets\Factories\WidgetFactory;
 use Arrilot\Widgets\Misc\LaravelApplicationWrapper;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Str;
 
-class ServiceProvider extends \Illuminate\Support\ServiceProvider
-{
+class ServiceProvider extends \Illuminate\Support\ServiceProvider {
     /**
      * Register the service provider.
      *
      * @return void
      */
-    public function register()
-    {
+    public function register() {
         $this->mergeConfigFrom(
-            __DIR__.'/config/config.php', 'laravel-widgets'
+            __DIR__ . '/config/config.php', 'laravel-widgets'
         );
 
         $this->app->bind('arrilot.widget', function () {
@@ -53,15 +52,14 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
      *
      * @return void
      */
-    public function boot()
-    {
+    public function boot() {
         $this->publishes([
-            __DIR__.'/config/config.php' => config_path('laravel-widgets.php'),
+            __DIR__ . '/config/config.php' => config_path('laravel-widgets.php'),
         ]);
 
         $routeConfig = [
-            'namespace'  => 'Arrilot\Widgets\Controllers',
-            'prefix'     => 'arrilot',
+            'namespace' => 'Arrilot\Widgets\Controllers',
+            'prefix' => 'arrilot',
             'middleware' => $this->app['config']->get('laravel-widgets.route_middleware', []),
         ];
 
@@ -73,6 +71,32 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
 
         Blade::directive('widget', function ($expression) {
             return "<?php echo app('arrilot.widget')->run($expression); ?>";
+        });
+        Blade::directive('widgetInclude', function ($expression) {
+//            $args = explode(',', $expression);
+            $args = [];
+            eval("\$args = [$expression]");
+            $nameCase = $args[0];
+            $nameSlug = Str::snake($args[0]);
+            $params = [];
+            $params['view'] = "widgets.$nameSlug.main";
+            $theme_path = base_path('Themes/' . config('theme.active') . '/views');
+            $path_config = $theme_path . '/widgets/' . $nameSlug . '/main.json';
+            if (isset($args[1])) {
+                if (isset($args[1]['page'])) {
+                    $params['page'] = $args[1]['page'];
+                    $path_config = $theme_path . '/pages/' . $params['page'] . '/widgets/main.json';
+                }
+            }
+            if (file_exists($path_config)) {
+                $params['json'] = file_get_contents($path_config);
+                $wg_config = json_decode($params['json']);
+                if (!empty($wg_config->style))
+                    $params['view'] = "widgets.$nameSlug.{$wg_config->style}";
+            }
+
+            $newExpression = "$nameCase," . var_export($params, true);//var_export($, true);
+            return "<?php echo app('arrilot.widget')->run($newExpression); ?>";
         });
 
         Blade::directive('asyncWidget', function ($expression) {
@@ -89,8 +113,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
      *
      * @return array
      */
-    public function provides()
-    {
+    public function provides() {
         return ['arrilot.widget', 'arrilot.async-widget'];
     }
 }
