@@ -75,7 +75,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider {
         Blade::directive('widgetInclude', function ($expression) {
 //            $args = explode(',', $expression);
             $args = [];
-            eval("\$args = [$expression]");
+            eval("\$args = [$expression];");
             $nameCase = $args[0];
             $nameSlug = Str::snake($args[0]);
             $params = [];
