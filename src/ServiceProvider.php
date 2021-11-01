@@ -80,22 +80,25 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider {
             $nameSlug = Str::snake($args[0]);
             $params = [];
             $params['view'] = "widgets.$nameSlug.main";
+            $params['page'] = '';
             $theme_path = base_path('Themes/' . config('theme.active') . '/views');
             $path_config = $theme_path . '/widgets/' . $nameSlug . '/main.json';
             if (isset($args[1])) {
                 if (isset($args[1]['page'])) {
                     $params['page'] = $args[1]['page'];
-                    $path_config = $theme_path . '/pages/' . $params['page'] . '/widgets/main.json';
                 }
             }
+            if(!empty($params['page'])) $path_config = $theme_path . '/pages/' . $params['page'] . '/widgets/' . $nameSlug.'/main.json';
             if (file_exists($path_config)) {
                 $params['json'] = file_get_contents($path_config);
                 $wg_config = json_decode($params['json']);
+                $params['json'] = json_encode($wg_config);
                 if (!empty($wg_config->style))
                     $params['view'] = "widgets.$nameSlug.{$wg_config->style}";
             }
 
-            $newExpression = "$nameCase," . var_export($params, true);//var_export($, true);
+            $newExpression = "'$nameCase'," . var_export($params, true);//var_export($, true);
+//            dd($newExpression);
             return "<?php echo app('arrilot.widget')->run($newExpression); ?>";
         });
 
