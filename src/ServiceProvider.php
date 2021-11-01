@@ -89,13 +89,16 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider {
                 }
             }
             if(!empty($params['page'])) $path_config = $theme_path . '/pages/' . $params['page'] . '/widgets/' . $nameSlug.'/main.json';
+            $wg_config = json_decode('{}');
             if (file_exists($path_config)) {
                 $params['json'] = file_get_contents($path_config);
                 $wg_config = json_decode($params['json']);
-                $params['json'] = json_encode($wg_config);
-                if (!empty($wg_config->style))
-                    $params['view'] = "widgets.$nameSlug.{$wg_config->style}";
             }
+            if(!empty($args[1]['config'])) {
+                foreach($args[1]['config'] as $k => $v) $wg_config->{$k} = $v;
+            }
+            $params['json'] = json_encode($wg_config);
+            if (!empty($wg_config->style)) $params['view'] = "widgets.$nameSlug.{$wg_config->style}";
 
             $newExpression = "'$nameCase'," . var_export($params, true);//var_export($, true);
 //            dd($newExpression);
