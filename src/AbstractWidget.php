@@ -56,6 +56,7 @@ abstract class AbstractWidget
 
         if(isset($config['json'])) {
             if(is_string($config['json'])) $config['json'] = json_decode($config['json']);
+            else $config['json'] = (array)$config['json'];
         }
         foreach ($config as $key => $value) {
             $this->config[$key] = $value;
