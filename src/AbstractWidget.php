@@ -54,7 +54,9 @@ abstract class AbstractWidget
         if(!empty($config['view'])) $this->view = $config['view'];
         else $this->view = $this->default_view;
 
-        if(isset($config['json'])) $config['json'] = json_decode($config['json']);
+        if(isset($config['json'])) {
+            if(is_string($config['json'])) $config['json'] = json_decode($config['json']);
+        }
         foreach ($config as $key => $value) {
             $this->config[$key] = $value;
         }
