@@ -103,7 +103,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider {
 
             $exportParams = var_export($params, true);
             $newExpression = "'$nameCase'," . $exportParams;//var_export($, true);
-            $newExpression = preg_replace('/\'\$\%([a-zA-Z0-9\_]+)\'', '\$$1', $newExpression);
+            $newExpression = preg_replace('/\'\$\%([a-zA-Z0-9\_]+)\'/mi', '\$$1', $newExpression);
 //            dd($newExpression);
             return "<?php echo app('arrilot.widget')->run($newExpression); ?>";
         });
