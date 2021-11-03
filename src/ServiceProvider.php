@@ -74,9 +74,23 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider {
         });
         Blade::directive('widgetInclude', function ($expression) {
 //            $args = explode(',', $expression);
-            $args = [];
-            $expression = preg_replace('/\$([a-zA-Z0-9\_]+)/m', '\'\$%$1\'', $expression);
-            eval("\$args = [$expression];");
+//            var_dump($expression);die;
+//            $expression = stripslashes($expression);
+            $executePHP = "<?php \$args = [$expression];";
+            $executePHP .= <<<'EOD'
+            if(!function_exists('mergeArrayToObject')) {
+                function mergeArrayToObject($obj1, &$obj2) {
+                    if (is_object($obj2)) {
+                        foreach($obj1 as $k => $v) {
+                            if(!is_array($v) && !is_object($v)) $obj2->{$k} = $v;
+                            else {
+                                if(!isset($obj2->{$k})) $obj2->{$k} = (object)[];
+                                mergeArrayToObject($v, $obj2->{$k});
+                            }
+                        }
+                    }
+                }
+            }
             $nameCase = $args[0];
             $nameSlug = Str::snake($args[0]);
             $params = [];
@@ -96,15 +110,14 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider {
                 $wg_config = json_decode($params['json']);
             }
             if(!empty($args[1]['config'])) {
-                $this->mergeArrayToObject($args[1]['config'], $wg_config);
+                mergeArrayToObject($args[1]['config'], $wg_config);
             }
             $params['json'] = $wg_config;
             if (!empty($wg_config->style)) $params['view'] = "widgets.$nameSlug.{$wg_config->style}";
-
-            $exportParams = var_export($params, true);
-            $newExpression = "'$nameCase'," . $exportParams;//var_export($, true);
-            $newExpression = preg_replace('/(\'|\")\$\%([a-zA-Z0-9\_]+)(\'|\")/mi', '\$$2', $newExpression);
-            return "<?php echo app('arrilot.widget')->run($newExpression); ?>";
+            echo app('arrilot.widget')->run($nameCase, $params);
+            ?>
+            EOD;
+            return $executePHP;
         });
 
         Blade::directive('asyncWidget', function ($expression) {

@@ -11,7 +11,7 @@
     ],
     "homepage": "https://github.com/arrilot/laravel-widgets",
     "require": {
-        "php": ">=7.0",
+        "php": ">=7.3",
         "illuminate/support": ">=5.5",
         "illuminate/contracts": ">=5.5",
         "illuminate/view": ">=5.5",
