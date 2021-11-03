@@ -75,6 +75,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider {
         Blade::directive('widgetInclude', function ($expression) {
 //            $args = explode(',', $expression);
             $args = [];
+            $expression = preg_replace('/\$([a-zA-Z0-9\_]+)/m', '\'\$%$1\'', $expression);
             eval("\$args = [$expression];");
             $nameCase = $args[0];
             $nameSlug = Str::snake($args[0]);
@@ -100,7 +101,9 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider {
             $params['json'] = json_encode($wg_config);
             if (!empty($wg_config->style)) $params['view'] = "widgets.$nameSlug.{$wg_config->style}";
 
-            $newExpression = "'$nameCase'," . var_export($params, true);//var_export($, true);
+            $exportParams = var_export($params, true);
+            $newExpression = "'$nameCase'," . $exportParams;//var_export($, true);
+            $newExpression = preg_replace('/\'\$\%([a-zA-Z0-9\_]+)\'', '\$$1', $newExpression);
 //            dd($newExpression);
             return "<?php echo app('arrilot.widget')->run($newExpression); ?>";
         });
