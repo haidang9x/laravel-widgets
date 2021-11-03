@@ -96,15 +96,14 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider {
                 $wg_config = json_decode($params['json']);
             }
             if(!empty($args[1]['config'])) {
-                foreach($args[1]['config'] as $k => $v) $wg_config->{$k} = $v;
+                $this->mergeArrayToObject($args[1]['config'], $wg_config);
             }
-            $params['json'] = json_encode($wg_config);
+            $params['json'] = $wg_config;
             if (!empty($wg_config->style)) $params['view'] = "widgets.$nameSlug.{$wg_config->style}";
 
             $exportParams = var_export($params, true);
             $newExpression = "'$nameCase'," . $exportParams;//var_export($, true);
-            $newExpression = preg_replace('/\'\$\%([a-zA-Z0-9\_]+)\'/mi', '\$$1', $newExpression);
-//            dd($newExpression);
+            $newExpression = preg_replace('/(\'|\")\$\%([a-zA-Z0-9\_]+)(\'|\")/mi', '\$$2', $newExpression);
             return "<?php echo app('arrilot.widget')->run($newExpression); ?>";
         });
 
@@ -116,7 +115,17 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider {
             return "<?php echo app('arrilot.widget-group-collection')->group($expression)->display(); ?>";
         });
     }
-
+    private function mergeArrayToObject($obj1, &$obj2) {
+        if (is_object($obj2)) {
+            foreach($obj1 as $k => $v) {
+                if(is_string($v)) $obj2->{$k} = $v;
+                else {
+                    if(!isset($obj2->{$k})) $obj2->{$k} = (object)[];
+                    $this->mergeArrayToObject($v, $obj2->{$k});
+                }
+            }
+        }
+    }
     /**
      * Get the services provided by the provider.
      *
