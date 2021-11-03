@@ -118,7 +118,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider {
     private function mergeArrayToObject($obj1, &$obj2) {
         if (is_object($obj2)) {
             foreach($obj1 as $k => $v) {
-                if(is_string($v)) $obj2->{$k} = $v;
+                if(!is_array($v) && !is_object($v)) $obj2->{$k} = $v;
                 else {
                     if(!isset($obj2->{$k})) $obj2->{$k} = (object)[];
                     $this->mergeArrayToObject($v, $obj2->{$k});
