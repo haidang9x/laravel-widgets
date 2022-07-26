@@ -72,6 +72,9 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider {
         Blade::directive('widget', function ($expression) {
             return "<?php echo app('arrilot.widget')->run($expression); ?>";
         });
+        Blade::directive('widgetRender', function ($expression) {
+            return "<?php echo app('arrilot.widget')->run($expression); ?>";
+        });
         Blade::directive('widgetInclude', function ($expression) {
 //            $args = explode(',', $expression);
 //            var_dump($expression);die;
