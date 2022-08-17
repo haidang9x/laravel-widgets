@@ -28,6 +28,7 @@ abstract class AbstractWidgetFactory
      */
     protected $widgetConfig;
 
+    public $func_name;
     /**
      * The name of the widget being called.
      *
@@ -124,6 +125,7 @@ abstract class AbstractWidgetFactory
         WidgetId::increment();
 
         $str = array_shift($params);
+        $this->func_name = $str;
 
         if (preg_match('#^(.*?)::(.*?)$#', $str, $m)) {
             $rootNamespace = $this->app->get('arrilot.widget-namespaces')->getNamespace($m[1]);
