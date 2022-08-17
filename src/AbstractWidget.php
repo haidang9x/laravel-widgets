@@ -43,7 +43,7 @@ abstract class AbstractWidget
     protected $config = [];
     protected $view = '';
     protected $default_view = '';
-    protected $widget_name = '';
+    public $widget_name = '';
 
     /**
      * Constructor.

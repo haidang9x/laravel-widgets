@@ -154,7 +154,7 @@ abstract class AbstractWidgetFactory
         }
 
         $this->widget = $this->app->make($widgetClass, ['config' => $this->widgetConfig]);
-         $this->widget->widget_name = $str;
+        $this->widget->widget_name = $str;
 
 
         if (static::$allowOnlyWidgetsWithDisabledEncryption && $this->widget->encryptParams) {
