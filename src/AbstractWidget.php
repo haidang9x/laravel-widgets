@@ -54,6 +54,11 @@ abstract class AbstractWidget
         if(!empty($config['view'])) $this->view = $config['view'];
         else $this->view = $this->default_view;
 
+        if(isset($config['c_key']) && \Cache::has($config['c_key'])) {
+            $config_cache = \Cache::get($config['c_key']);
+            $config = array_merge($config, $config_cache);
+        }
+
         if(isset($config['json'])) {
             if(is_string($config['json'])) $config['json'] = json_decode($config['json']);
             else $config['json'] = $config['json'];
