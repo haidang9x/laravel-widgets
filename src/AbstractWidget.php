@@ -44,6 +44,7 @@ abstract class AbstractWidget
     protected $view = '';
     protected $default_view = '';
     public $widget_name = '';
+    public $run = null;
 
     /**
      * Constructor.

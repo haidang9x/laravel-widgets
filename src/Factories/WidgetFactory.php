@@ -51,7 +51,10 @@ class WidgetFactory extends AbstractWidgetFactory
      */
     protected function getContent()
     {
-        $content = $this->app->call([$this->widget, 'run'], $this->widgetParams);
+        
+        if($this->widget->run) $run = $this->widget->run;
+        else $run = 'run';
+        $content = $this->app->call([$this->widget, $run], $this->widgetParams);
         if (isset($this->widgetConfig['pass_data'])) {
             if (is_object($content)) foreach ($this->widgetConfig['pass_data'] as $k => $v) $content = $content->with($k, $v);
         }
