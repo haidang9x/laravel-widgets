@@ -94,6 +94,7 @@ class JavascriptFactory
     {
         $encodedParams = json_encode($this->widgetFactory->widgetFullParams);
         $queryParams = [
+            'ajax' => 1,
             'id'     => WidgetId::get(),
             'name'   => $this->widgetFactory->getWidgetNameWithCustomNamespace(),
             'params' => $encryptParams ? $this->widgetFactory->encryptWidgetParams($encodedParams) : $encodedParams,
