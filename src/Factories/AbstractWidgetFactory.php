@@ -19,7 +19,7 @@ abstract class AbstractWidgetFactory
      *
      * @var AbstractWidget
      */
-    protected $widget;
+    public $widget;
 
     /**
      * Widget configuration array.
