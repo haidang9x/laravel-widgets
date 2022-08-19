@@ -32,7 +32,7 @@ class WidgetController extends BaseController
         $params = $decodedParams ?: [];
         array_unshift($params, $widgetName);
 
-        return call_user_func_array([$factory, $factory->run], $params);
+        return call_user_func_array([$factory, $factory->widget->run], $params);
     }
 
     /**
