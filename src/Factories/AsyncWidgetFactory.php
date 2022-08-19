@@ -16,6 +16,9 @@ class AsyncWidgetFactory extends AbstractWidgetFactory
         $placeholder = call_user_func([$this->widget, 'placeholder']);
         $loader = $this->javascriptFactory->getLoader($this->widget->encryptParams);
         $content = $this->wrapContentInContainer($placeholder.$loader);
+        if($this->widget->ajax_appendage) {
+            $content .= $this->widget->ajax_appendage;
+        }
 
         return $this->convertToViewExpression($content);
     }

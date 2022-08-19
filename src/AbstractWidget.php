@@ -45,6 +45,7 @@ abstract class AbstractWidget
     protected $default_view = '';
     public $widget_name = '';
     public $run = null;
+    public $ajax_appendage = NULL;
 
     /**
      * Constructor.
