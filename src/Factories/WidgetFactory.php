@@ -59,7 +59,12 @@ class WidgetFactory extends AbstractWidgetFactory
             if (is_object($content)) foreach ($this->widgetConfig['pass_data'] as $k => $v) $content = $content->with($k, $v);
         }
 
-        return is_object($content) ? $content->__toString() : $content;
+        $content = is_object($content) ? $content->__toString() : $content;
+
+        if ($this->widget->ajax_appendage) {
+            $content .= $this->widget->ajax_appendage;
+        }
+        return $content;
     }
 
     /**
