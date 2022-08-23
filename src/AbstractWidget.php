@@ -62,8 +62,8 @@ abstract class AbstractWidget
             $config = array_merge($config, $config_cache);
         }
 
-        if(isset($config['var_key']) && \SharedGlobal::has($config['var_key'])) {
-            $config_var = \SharedGlobal::get($config['var_key']);
+        if(isset($config['c_key']) && \SharedGlobal::has($config['c_key'])) {
+            $config_var = \SharedGlobal::get($config['c_key']);
             $config = array_merge($config, $config_var);
         }
 
