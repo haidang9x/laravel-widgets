@@ -62,6 +62,11 @@ abstract class AbstractWidget
             $config = array_merge($config, $config_cache);
         }
 
+        if(isset($config['var_key']) && \SharedGlobal::has($config['var_key'])) {
+            $config_var = \SharedGlobal::get($config['var_key']);
+            $config = array_merge($config, $config_var);
+        }
+
         if(isset($config['json'])) {
             if(is_string($config['json'])) $config['json'] = json_decode($config['json']);
             else $config['json'] = $config['json'];
