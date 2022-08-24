@@ -1,33 +1,7 @@
 <div id="{{ $uqid = empty($uniqid)?uniqid():$uniqid }}" class="widget-options">
-    <form class="setting-form mb-2">
-        <div class="form-group">
-            <div class="custom-control custom-switch">
-                <input id="{{ "label-$uqid" }}" name="global" type="checkbox"
-                       class="custom-control-input" {{ !empty($item->global)?'checked':'' }}>
-                <label class="custom-control-label" for="{{ "label-$uqid" }}">Use global widget</label>
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label class="col-2">Style:</label>
-            <select name="style" class="form-control col-10">
-                @if(!empty($item->path_dir))
-                    @php($filesStyle = \File::glob(base_path($item->path_dir . '/*.blade.php')))
-                    @foreach($filesStyle as $file)
-                        @php($fileName = basename($file, '.blade.php'))
-                        <option
-                                value="{{ $fileName }}"{{ $item->style==$fileName?'selected':''}}>{{ $fileName }}</option>
-                    @endforeach
-                @endif
-            </select>
-        </div>
-        <button class="btn btn-info" type="submit">
-            Save To Publish
-        </button>
-        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#{{ "modal-$uqid" }}">
-            Content Editor
-        </button>
-    </form>
+    
+   @include('pages.interface.settings.above')
+   
     <form class="content-form">
         <div class="modal fade" id="{{ "modal-$uqid" }}" style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-lg">
