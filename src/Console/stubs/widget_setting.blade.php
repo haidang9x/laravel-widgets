@@ -28,25 +28,12 @@
 </div>
 @section('widgets_js')
 @parent
-<script type="text/babel">
+<script data-type="{{ !empty($draggabled)?'javascript':'babel' }}">
     (function () {
         var uqid = '{{ $uqid }}';
         var widgetJson = {!! json_encode($item) !!};
         function settingSave(that) {
-            setItemPathIndex(widgetJson, $(that));
-            settings_queue['set' + uqid] = {
-                type: 'setting',
-                config: widgetJson,
-                post_data: $(that).serialize(),
-                run_name: 'FaqsFromBing'
-            };
-            var btnSubmit = $(that).find('button[type="submit"]');
-            if(btnSubmit.text() != 'Saved!') {
-                setTimeout(function (t) {
-                    btnSubmit.text(t);
-                }, 2000, btnSubmit.text());
-                btnSubmit.text('Saved!');
-            }
+            saveSettingOptions(widgetJson, that, '[run_name]');
             return false;
         }
         $('#' + uqid).find('.setting-form :input').on('change', function () {
