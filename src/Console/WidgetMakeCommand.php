@@ -220,6 +220,10 @@ class WidgetMakeCommand extends GeneratorCommand {
         $widget_blade_setting = str_replace('[run_name]', $name, $widget_blade_setting);
         $this->files->put(base_path('/Themes/admin/views/pages/interface/settings/widgets/' . $widget_name . '.blade.php'), $widget_blade_setting);
 
+        $widget_blade_setting = file_get_contents(__DIR__ . '/stubs/widget_setting_editor.blade.php');
+        $widget_blade_setting = str_replace('[run_name]', $name, $widget_blade_setting);
+        $this->files->put(base_path('/Themes/admin/views/pages/interface/settings/editor/' . $widget_name . '.blade.php'), $widget_blade_setting);
+
         //controller settings
         $widget_controller_setting = file_get_contents(__DIR__ . '/stubs/settings_controller.php');
         $widget_controller_setting = str_replace('class RunName', "class $name", $widget_controller_setting);

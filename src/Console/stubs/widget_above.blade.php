@@ -27,9 +27,19 @@
                 {{-- <button class="btn btn-info" type="submit">
                         Save To Publish
                     </button> --}}
-                <button type="button" class="btn btn-default open-modal" data-toggle="modal" data-target="#{{ "modal-$uqid" }}">
+                <button type="button" class="btn btn-default open-modal" data-toggle="modal"
+                    data-target="#{{ "modal-$uqid" }}">
                     Content Editor
                 </button>
             </div>
         </div>
     </form>
+    @section('widgets_js')
+        @parent
+        <script>
+            bindEventOptions('{{ $uqid }}');
+        </script>
+    @stop
+    @if (!empty($draggabled))
+        @yield('widgets_js')
+    @endif
